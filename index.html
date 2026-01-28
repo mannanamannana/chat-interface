@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meet AI — Connect</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0d0d0d;
+      --surface-hi: #161616;
+      --text: #f0f0f0;
+      --text-sec: #a0a0a0;
+      --border: #222222;
+      --user-bg: #ffffff;
+      --user-text: #000000;
+      --glass-bg: rgba(255,255,255,0.05);
+      --glow: #ffffff33;
+      --accent: #4ade80;
+      --send-active: #4ade80;
+      --ai-glow: rgba(74, 222, 128, 0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      height: 100dvh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 900px;
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 30px 100px rgba(0,0,0,0.9);
+    }
+    .header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; background: linear-gradient(to bottom, #111111, transparent); }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #444444, #222222); display: grid; place-items: center; font-weight: 700; font-size: 1.3rem; color: #ffffff; }
+    .name-area h2 { font-size: 1.2rem; font-weight: 500; }
+    .status { font-size: 0.82rem; color: var(--text-sec); }
+    .messages { padding: 28px 28px 80px; overflow-y: auto; display: flex; flex-direction: column; gap: 28px; scrollbar-width: thin; scrollbar-color: #444 #111; scroll-behavior: smooth; }
+    .messages::-webkit-scrollbar { width: 6px; }
+    .messages::-webkit-scrollbar-track { background: #0a0a0a; }
+    .messages::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+    .message { max-width: 82%; padding: 14px 20px; border-radius: 20px; line-height: 1.5; font-size: 1.05rem; position: relative; }
+    .message.user { align-self: flex-end; background: var(--user-bg); color: var(--user-text); border-bottom-right-radius: 6px; }
+    .message.bot {
+      align-self: flex-start;
+      background: var(--surface-hi);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 0 15px var(--ai-glow), inset 0 0 20px var(--ai-glow);
+      animation: ai-glow-pulse 8s infinite ease-in-out;
+    }
+    @keyframes ai-glow-pulse {
+      0%, 100% { box-shadow: 0 0 15px var(--ai-glow), inset 0 0 20px var(--ai-glow); }
+      50% { box-shadow: 0 0 25px rgba(74, 222, 128, 0.3), inset 0 0 30px rgba(74, 222, 128, 0.2); }
+    }
+    .time { font-size: 0.74rem; margin-top: 6px; opacity: 0.5; text-align: right; }
+    .suggestion-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; max-width: 82%; align-self: flex-start; }
+    .chip { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 999px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+    .chip:active { transform: scale(0.96); background: rgba(74,222,128,0.3); }
+    .chip::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.15); opacity: 0; transition: opacity 0.2s; }
+    .chip.clicked::after { opacity: 1; animation: ripple 0.6s; }
+    @keyframes ripple { 0% { transform: scale(0); opacity: 0.4; } 100% { transform: scale(4); opacity: 0; } }
+    .input-area { padding: 18px 28px; border-top: 1px solid var(--border); background: var(--surface); position: relative; }
+    .input-wrapper { display: flex; background: var(--surface-hi); border: 1px solid var(--border); border-radius: 999px; padding: 8px 10px; gap: 10px; align-items: center; }
+    input[type="text"] { flex: 1; background: transparent; border: none; outline: none; color: var(--text); padding: 0 16px; font-size: 1.05rem; }
+    input::placeholder { color: #777777; }
+    button { width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.4rem; font-weight: bold; cursor: pointer; display: grid; place-items: center; transition: all 0.22s; }
+    #send { background: #555; color: white; }
+    #send.active { background: var(--send-active); color: black; }
+    #voiceBtn { background: #333; color: white; }
+    #voiceBtn svg { stroke: white; width: 26px; height: 26px; }
+    #voiceBtn.listening { background: #e74c3c; transform: scale(1.1); }
+    #voiceBtn.listening svg { stroke: white; animation: pulse 1.5s infinite; }
+    .char-count { font-size: 0.8rem; color: var(--text-sec); text-align: right; margin-right: 16px; margin-top: 4px; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+    @media (max-width: 640px) {
+      .chat-container { border-radius: 0; border: none; box-shadow: none; }
+      .messages { padding: 18px 18px 100px; }
+      .header, .input-area { padding-left: 18px; padding-right: 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="chat-container">
+  <header class="header">
+    <div class="header-left">
+      <div class="avatar">AI</div>
+      <div class="name-area">
+        <h2>Meet AI</h2>
+        <div class="status" id="statusText">Connected from your location</div>
+      </div>
+    </div>
+  </header>
+  <div class="messages" id="messages"></div>
+  <div class="input-area">
+    <div class="input-wrapper">
+      <input type="text" id="input" placeholder="Type here…" autocomplete="off"/>
+      <button id="voiceBtn" title="Speak your message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" x2="12" y1="19" y2="22"/>
+        </svg>
+      </button>
+      <button id="send">→</button>
+    </div>
+    <div class="char-count" id="charCount">0/300</div>
+  </div>
+</div>
+
+<script>
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('input');
+  const sendBtn = document.getElementById('send');
+  const voiceBtn = document.getElementById('voiceBtn');
+  const statusText = document.getElementById('statusText');
+  const charCountEl = document.getElementById('charCount');
+
+  // ──────────────────────────────────────────────
+  // STATE
+  // ──────────────────────────────────────────────
+  let userName = null;
+  let connectionType = null;
+  let userWant = "";
+  let userDontWant = "";
+  let currentMatchName = null;
+  let state = 'asking_name';
+  let userLocation = "your location";
+
+  // ──────────────────────────────────────────────
+  // VARIATION BANKS
+  // ──────────────────────────────────────────────
+  const variations = {
+    depthRequest: [
+      "Before I move forward, I need a bit more from you. The quality of this connection depends on it.",
+      "This part matters. Strong connections start with a little more clarity.",
+      "I want to do this properly, not quickly. Say a bit more before I proceed.",
+      "To find the right person, I need more than a surface-level request.",
+      "I’m being intentional here — a little more context will help me match you well."
+    ],
+    stakesRaiser: [
+      "What you share next will be sent directly to the person you’re interested in.",
+      "Your words here won’t stay in the system — they’ll be shared with the person.",
+      "This message is important. I’ll pass it on as-is.",
+      "Take your time with this. It’s the message they’ll see.",
+      "What you write here becomes your introduction."
+    ],
+    guidance: [
+      "One thoughtful paragraph is enough — why this connection matters to you, and what you’re hoping for.",
+      "You don’t need to write much. Just be clear about what you value and why you reached out.",
+      "A short, honest message works best — what drew you to this connection, and what you’re looking for.",
+      "Say it in your own words. Focus on intent, not polish."
+    ],
+    confirmation: [
+      "I’ve sent your information to {person}.",
+      "Your message has been shared with {person}.",
+      "I’ve passed your introduction on to {person}.",
+      "{person} has received what you shared.",
+      "Your details are now with {person}."
+    ],
+    nextEvent: [
+      "When they express interest, I’ll initiate contact.",
+      "If they’d like to proceed, I’ll connect you both here.",
+      "As soon as they respond positively, I’ll open the conversation.",
+      "Once there’s mutual interest, I’ll take it from there."
+    ],
+    holding: [
+      "I’m now looking for the person who genuinely matches what you’ve described.",
+      "I’m being selective here — alignment matters more than speed.",
+      "I’ll take care with this. The right match is worth waiting for.",
+      "I’m focused on quality over availability.",
+      "I’ll reach out when there’s someone who fits what you’re looking for."
+    ],
+    statusCheck: [
+      "Still waiting on a response. Most people take a little time — I’ll notify you the moment I hear back.",
+      "No update yet, but everything is in motion.",
+      "Nothing to report just yet. I’m keeping an eye on it.",
+      "We’re still in the waiting window. I’ll step in as soon as there’s movement."
+    ]
+  };
+
+  function pickVariant(bankName) {
+    const bank = variations[bankName];
+    if (!bank || bank.length === 0) return "…";
+    return bank[Math.floor(Math.random() * bank.length)];
+  }
+
+  // ──────────────────────────────────────────────
+  // HELPERS
+  // ──────────────────────────────────────────────
+  function updateLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude: lat, longitude: lon } = position.coords;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+            const data = await res.json();
+            const city = data.address?.city || data.address?.town || data.address?.village || '';
+            const region = data.address?.state || '';
+            const country = data.address?.country || '';
+            userLocation = [city, region, country].filter(Boolean).join(', ') || "Dar es Salaam";
+            statusText.textContent = `Connected from ${userLocation}`;
+          } catch {
+            statusText.textContent = "Connected from Dar es Salaam";
+          }
+        },
+        () => statusText.textContent = "Connected from Dar es Salaam"
+      );
+    } else {
+      statusText.textContent = "Connected from Dar es Salaam";
+    }
+  }
+
+  function addMessage(text, isUser = false) {
+    const msg = document.createElement('div');
+    msg.className = `message ${isUser ? 'user' : 'bot'}`;
+    const content = document.createElement('div');
+    content.innerHTML = text;
+    const time = document.createElement('div');
+    time.className = 'time';
+    time.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    msg.append(content, time);
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+  }
+
+  async function typeWriter(fullText, element) {
+    element.innerHTML = '';
+    let displayed = '';
+    for (let i = 0; i < fullText.length; i++) {
+      displayed += fullText[i];
+      element.innerHTML = displayed;
+      await new Promise(r => setTimeout(r, 25 + Math.random() * 35));
+      messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+    }
+  }
+
+  async function thoughtfulDelay(min = 900, max = 1800) {
+    await new Promise(r => setTimeout(r, min + Math.random() * (max - min)));
+  }
+
+  async function botReply(text, delay = true) {
+    if (delay) await thoughtfulDelay();
+
+    const msg = document.createElement('div');
+    msg.className = 'message bot';
+    const content = document.createElement('div');
+    msg.appendChild(content);
+    const time = document.createElement('div');
+    time.className = 'time';
+    time.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    msg.appendChild(time);
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+
+    await thoughtfulDelay(600, 1400);
+    await typeWriter(text, content);
+  }
+
+  function addSuggestions(options, onSelect) {
+    const container = document.createElement('div');
+    container.className = 'suggestion-chips';
+    options.forEach(opt => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.textContent = opt;
+      chip.onclick = () => {
+        chip.classList.add('clicked');
+        setTimeout(() => {
+          onSelect(opt);
+          container.remove();
+          inputEl.focus();
+        }, 280);
+      };
+      container.appendChild(chip);
+    });
+    messagesEl.appendChild(container);
+    messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+  }
+
+  // ──────────────────────────────────────────────
+  // CONTENT
+  // ──────────────────────────────────────────────
+  const categoryQuestions = {
+    "Business Partners": "What kind of business partner are you looking for — co-founder, sales, distribution, marketing…?",
+    "Collaborators": "What project or goal are you working on, and what skills or resources would help most?",
+    "Investors": "What stage is your project (idea, MVP, revenue), and what kind of investor support do you need?",
+    "Mentors": "What area do you want guidance in right now — career, startup, personal growth…?",
+    "Accountability Partners": "What habit or goal are you building, and how often do you want check-ins?",
+    "Sponsors": "What are you building or creating, and what type of sponsorship or support are you seeking?",
+    "Recruiters": "What role or industry are you targeting, and what experience or skills do you want to highlight?",
+    "Introducers": "Who would you value an introduction to, and why would that connection matter?",
+    "Friends": "What kind of friends are you hoping to connect with — shared interests, similar energy, age range…?",
+    "Companions": "Casual hangouts, travel buddies, or something deeper? Any preferred vibe or activities?"
+  };
+
+  // ──────────────────────────────────────────────
+  // MAIN LOGIC
+  // ──────────────────────────────────────────────
+  async function send() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    addMessage(text, true);
+    inputEl.value = "";
+    charCountEl.textContent = "0/300";
+    sendBtn.classList.remove('active');
+
+    const lower = text.toLowerCase();
+
+    if (state === 'asking_name') {
+      if (text.length < 2 || /bot|ai/i.test(text)) {
+        await botReply("That doesn’t feel like a real name. What should I call you?");
+        return;
+      }
+      userName = text.trim().split(' ')[0];
+      state = 'asking_connection_type';
+      await botReply(`Good to meet you, ${userName}.`);
+      await botReply("Let’s make this useful. Who are you looking to connect with right now?");
+      await botReply("No right or wrong answer — just what’s most relevant for you at the moment.");
+      addSuggestions(Object.keys(categoryQuestions), async (selected) => {
+        connectionType = selected;
+        await botReply(`Understood — you’re seeking <strong>${connectionType}</strong>.`);
+        await thoughtfulDelay(1200, 2200);
+        await botReply("Finding people who actually fit takes clarity. Let’s get it right.");
+        await botReply(categoryQuestions[connectionType]);
+        state = 'asking_details';
+      });
+      return;
+    }
+
+    if (state === 'asking_details') {
+      userWant = text.trim();
+      await botReply(`So you’re looking for someone who can help with:<br><br><em>${userWant}</em>`);
+      await botReply("Does that capture it accurately?");
+      addSuggestions([
+        "Yes — this is accurate",
+        "No — let me adjust",
+        "Change the type of connection"
+      ], async (choice) => {
+        if (choice === "Yes — this is accurate") {
+          await botReply("Clear intent like that attracts better matches.");
+          await thoughtfulDelay(1400, 2400);
+          await botReply("One final filter: in one sentence, what do you <strong>not</strong> want in this kind of connection?");
+          state = 'asking_dont_want';
+        } else if (choice === "No — let me adjust") {
+          await botReply("No issue. What needs to change?");
+        } else {
+          state = 'asking_connection_type';
+          await botReply("Understood. What type of connection are you seeking instead?");
+        }
+      });
+      return;
+    }
+
+    if (state === 'asking_dont_want') {
+      userDontWant = text.trim();
+      await botReply(`Got it. I’ll actively filter out anything resembling ${userDontWant.toLowerCase()}.`);
+      await botReply("Searching for strong, low-noise matches now…");
+      await thoughtfulDelay(2800, 4200);
+
+      const fakeMatches = [
+        {name: "Aisha Mwangi", desc: `Dar es Salaam • Usually replies within hours • Prefers WhatsApp`, tags: ["Local", "Direct", "Goal-driven"]},
+        {name: "Jamal Kweka", desc: `Based in ${userLocation.split(',')[0]} • Likes voice notes • Evenings active`, tags: ["Relaxed", "Supportive"]},
+        {name: "Fatima Zuberi", desc: `Passionate about meaningful ${connectionType.toLowerCase()} • Loves thoughtful convos`, tags: ["Creative", "Deep"]}
+      ];
+
+      await botReply(`Here are three people who align well with what you described, ${userName}:`);
+
+      fakeMatches.forEach(m => {
+        addMessage(
+          `<strong>${m.name}</strong><br>${m.desc}<br>` +
+          `<div style="margin-top:8px;">${m.tags.map(t => `<span style="background:rgba(74,222,128,0.12);color:var(--accent);padding:4px 10px;border-radius:12px;font-size:0.9rem;margin-right:6px;">${t}</span>`).join('')}</div>`,
+          false
+        );
+      });
+
+      await thoughtfulDelay(1400, 2200);
+      await botReply(`Based on what you shared, Aisha looks especially aligned — but the decision is yours.`);
+      await botReply("What would you like to do next?");
+
+      addSuggestions([
+        "Send connection request to Aisha",
+        "Show more options",
+        "Try a different type of connection"
+      ], async (ch) => {
+        if (ch.includes("Aisha")) {
+          currentMatchName = "Aisha Mwangi";
+          state = 'awaiting_user_intent_message';
+          await botReply(pickVariant('depthRequest'));
+          await botReply(pickVariant('stakesRaiser').replace('{person}', currentMatchName));
+          await botReply(pickVariant('guidance'));
+          inputEl.placeholder = `Message to ${currentMatchName}…`;
+        }
+        else if (ch.toLowerCase().includes("more")) {
+          await botReply("Looking for additional strong matches… one moment.");
+          await thoughtfulDelay(2200, 3400);
+          await botReply("I’ll bring fresh options soon. Anything specific to prioritize?");
+        }
+        else {
+          state = 'asking_connection_type';
+          await botReply("Understood. What type of connection are you seeking now?");
+        }
+      });
+      return;
+    }
+
+    if (state === 'awaiting_user_intent_message') {
+      // Simulate sending (in production: actually transmit to backend)
+      const sentMsg = pickVariant('confirmation').replace('{person}', currentMatchName);
+      await botReply(sentMsg);
+      await botReply(pickVariant('nextEvent'));
+      await thoughtfulDelay(1400, 2400);
+      await botReply(pickVariant('holding'));
+      await botReply("You can return anytime. Say ‘status’, ‘refine’, or anything else.");
+      state = 'intent_submitted';
+      inputEl.placeholder = "Say 'status', 'refine', 'more matches', or anything…";
+      addMessage(`<em>Message delivered • Awaiting mutual interest from ${currentMatchName}</em>`, false);
+      return;
+    }
+
+    if (state === 'intent_submitted') {
+      if (lower.includes("status") || lower.includes("update") || lower.includes(currentMatchName?.toLowerCase())) {
+        await botReply(pickVariant('statusCheck'));
+      }
+      else if (lower.includes("refine") || lower.includes("change") || lower.includes("adjust")) {
+        state = 'asking_connection_type';
+        await botReply("Understood. Let’s adjust what you’re looking for. Who do you want to connect with now?");
+      }
+      else if (lower.includes("more") || lower.includes("other") || lower.includes("show")) {
+        await botReply("Finding additional people who fit your criteria… one moment.");
+        await thoughtfulDelay(2000, 3200);
+        await botReply("I’ll return with fresh options shortly. Anything particular to focus on?");
+      }
+      else {
+        await botReply("While we wait for the right alignment, is there anything you’d like to refine or explore further?");
+      }
+      return;
+    }
+
+    // Fallback
+    await botReply("Let’s stay focused. Who are you looking to connect with right now?");
+  }
+
+  // ──────────────────────────────────────────────
+  // EVENTS & INIT
+  // ──────────────────────────────────────────────
+  inputEl.addEventListener('input', () => {
+    const len = inputEl.value.length;
+    charCountEl.textContent = `${len}/300`;
+    sendBtn.classList.toggle('active', len > 0);
+  });
+
+  sendBtn.onclick = send;
+
+  inputEl.addEventListener('keypress', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+
+  window.addEventListener('load', async () => {
+    updateLocation();
+    await thoughtfulDelay(600, 1200);
+    await botReply("This is for intentional, high-signal connections. What should I call you?");
+  });
+</script>
+</body>
+</html>
