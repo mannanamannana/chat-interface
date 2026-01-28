@@ -17,6 +17,7 @@
       --glass-bg: rgba(255,255,255,0.05);
       --glow: #ffffff33;
       --accent: #4ade80;
+      --industry-accent: #60a5fa;
       --send-active: #4ade80;
       --ai-glow: rgba(74, 222, 128, 0.15);
     }
@@ -42,12 +43,43 @@
       overflow: hidden;
       box-shadow: 0 30px 100px rgba(0,0,0,0.9);
     }
-    .header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; background: linear-gradient(to bottom, #111111, transparent); }
+    .header {
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, #111111, transparent);
+    }
     .header-left { display: flex; align-items: center; gap: 14px; }
     .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #444444, #222222); display: grid; place-items: center; font-weight: 700; font-size: 1.3rem; color: #ffffff; }
     .name-area h2 { font-size: 1.2rem; font-weight: 500; }
     .status { font-size: 0.82rem; color: var(--text-sec); }
-    .messages { padding: 28px 28px 80px; overflow-y: auto; display: flex; flex-direction: column; gap: 28px; scrollbar-width: thin; scrollbar-color: #444 #111; scroll-behavior: smooth; }
+    .refresh-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #222;
+      color: #aaa;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { background: #333; color: #fff; }
+    .messages {
+      padding: 28px 28px 80px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      scrollbar-width: thin;
+      scrollbar-color: #444 #111;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
     .messages::-webkit-scrollbar { width: 6px; }
     .messages::-webkit-scrollbar-track { background: #0a0a0a; }
     .messages::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
@@ -66,12 +98,27 @@
       50% { box-shadow: 0 0 25px rgba(74, 222, 128, 0.3), inset 0 0 30px rgba(74, 222, 128, 0.2); }
     }
     .time { font-size: 0.74rem; margin-top: 6px; opacity: 0.5; text-align: right; }
-    .suggestion-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; max-width: 82%; align-self: flex-start; }
-    .chip { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.3); padding: 8px 14px; border-radius: 999px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      max-width: 82%;
+      align-self: flex-start;
+    }
+    .chip {
+      background: rgba(74,222,128,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(74,222,128,0.3);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
     .chip:active { transform: scale(0.96); background: rgba(74,222,128,0.3); }
-    .chip::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.15); opacity: 0; transition: opacity 0.2s; }
-    .chip.clicked::after { opacity: 1; animation: ripple 0.6s; }
-    @keyframes ripple { 0% { transform: scale(0); opacity: 0.4; } 100% { transform: scale(4); opacity: 0; } }
     .input-area { padding: 18px 28px; border-top: 1px solid var(--border); background: var(--surface); position: relative; }
     .input-wrapper { display: flex; background: var(--surface-hi); border: 1px solid var(--border); border-radius: 999px; padding: 8px 10px; gap: 10px; align-items: center; }
     input[type="text"] { flex: 1; background: transparent; border: none; outline: none; color: var(--text); padding: 0 16px; font-size: 1.05rem; }
@@ -79,16 +126,33 @@
     button { width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.4rem; font-weight: bold; cursor: pointer; display: grid; place-items: center; transition: all 0.22s; }
     #send { background: #555; color: white; }
     #send.active { background: var(--send-active); color: black; }
-    #voiceBtn { background: #333; color: white; }
-    #voiceBtn svg { stroke: white; width: 26px; height: 26px; }
-    #voiceBtn.listening { background: #e74c3c; transform: scale(1.1); }
-    #voiceBtn.listening svg { stroke: white; animation: pulse 1.5s infinite; }
     .char-count { font-size: 0.8rem; color: var(--text-sec); text-align: right; margin-right: 16px; margin-top: 4px; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+    .tags-row { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; }
+    .personality-tag { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.3); }
+    .industry-tag { background: rgba(96,165,250,0.12); color: var(--industry-accent); border: 1px solid rgba(96,165,250,0.3); }
+
+    /* ─── MOBILE OPTIMIZATIONS ─── */
     @media (max-width: 640px) {
       .chat-container { border-radius: 0; border: none; box-shadow: none; }
-      .messages { padding: 18px 18px 100px; }
-      .header, .input-area { padding-left: 18px; padding-right: 18px; }
+      .messages { padding: 16px 14px 100px; }
+      .message { max-width: 88%; padding: 12px 16px; font-size: 1rem; }
+      .input-wrapper { padding: 6px 8px; }
+      input[type="text"] { font-size: 1rem; }
+      button { width: 44px; height: 44px; font-size: 1.3rem; }
+      .tags-row { margin-top: 4px; gap: 6px; }
+      .tag { font-size: 0.8rem; padding: 3px 9px; }
+      .header, .input-area { padding-left: 16px; padding-right: 16px; }
+      .suggestion-chips {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 8px;
+      }
+      .chip { flex-shrink: 0; }
+    }
+    @media (max-width: 380px) {
+      .messages { padding: 12px 10px 90px; }
+      .message { max-width: 92%; }
     }
   </style>
 </head>
@@ -102,18 +166,12 @@
         <div class="status" id="statusText">Connected from your location</div>
       </div>
     </div>
+    <button class="refresh-btn" id="refreshBtn" title="Start over">↻</button>
   </header>
   <div class="messages" id="messages"></div>
   <div class="input-area">
     <div class="input-wrapper">
       <input type="text" id="input" placeholder="Type here…" autocomplete="off"/>
-      <button id="voiceBtn" title="Speak your message">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-          <line x1="12" x2="12" y1="19" y2="22"/>
-        </svg>
-      </button>
       <button id="send">→</button>
     </div>
     <div class="char-count" id="charCount">0/300</div>
@@ -124,12 +182,12 @@
   const messagesEl = document.getElementById('messages');
   const inputEl = document.getElementById('input');
   const sendBtn = document.getElementById('send');
-  const voiceBtn = document.getElementById('voiceBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
   const statusText = document.getElementById('statusText');
   const charCountEl = document.getElementById('charCount');
 
   // ──────────────────────────────────────────────
-  // STATE
+  // STATE & LOCAL STORAGE
   // ──────────────────────────────────────────────
   let userName = null;
   let connectionType = null;
@@ -139,8 +197,40 @@
   let state = 'asking_name';
   let userLocation = "your location";
 
+  // Load from localStorage on init
+  function loadState() {
+    const saved = localStorage.getItem('meetAIState');
+    if (saved) {
+      const data = JSON.parse(saved);
+      userName = data.userName;
+      connectionType = data.connectionType;
+      userWant = data.userWant || "";
+      userDontWant = data.userDontWant || "";
+      currentMatchName = data.currentMatchName;
+      state = data.state || 'asking_name';
+    }
+  }
+
+  function saveState() {
+    const data = {
+      userName,
+      connectionType,
+      userWant,
+      userDontWant,
+      currentMatchName,
+      state
+    };
+    localStorage.setItem('meetAIState', JSON.stringify(data));
+  }
+
+  // Refresh / restart
+  refreshBtn.onclick = () => {
+    localStorage.removeItem('meetAIState');
+    location.reload();
+  };
+
   // ──────────────────────────────────────────────
-  // VARIATION BANKS
+  // VARIATION BANKS (unchanged)
   // ──────────────────────────────────────────────
   const variations = {
     depthRequest: [
@@ -193,8 +283,80 @@
 
   function pickVariant(bankName) {
     const bank = variations[bankName];
-    if (!bank || bank.length === 0) return "…";
     return bank[Math.floor(Math.random() * bank.length)];
+  }
+
+  // ──────────────────────────────────────────────
+  // PROFILE GENERATION (unchanged)
+  // ──────────────────────────────────────────────
+  const firstNamesMale = ["Juma", "Ahmed", "Hassan", "Salim", "Yusuf", "Abdul", "Khamis", "Rashid", "Saidi", "Faraji", "Elias", "Baraka", "Daudi", "Emmanuel", "Frank", "George", "Isaac", "Joseph", "Michael", "Paul"];
+  const firstNamesFemale = ["Aisha", "Fatima", "Zainab", "Maryam", "Halima", "Salma", "Mwanaidi", "Saida", "Nuru", "Amina", "Hadija", "Rahma", "Siti", "Zuwena", "Jamila", "Layla", "Nafisa", "Shamira", "Tumaini", "Zahara"];
+  const surnames = ["Mwangi", "Kweka", "Zuberi", "Mushi", "Kariuki", "Nyerere", "Mkude", "Lema", "Mrema", "Kigoma", "Salum", "Abdallah", "Ramadhani", "Omary", "Said", "Hassan", "Juma"];
+
+  const locationBases = ["Dar es Salaam", "Arusha", "Mwanza", "Zanzibar", "Dodoma", "Mbeya", "Tanga"];
+  const locationModifiers = ["Kinondoni", "Oysterbay", "Upanga", "Mikocheni", ""];
+
+  const responseStyles = [
+    "Usually replies within hours", "Quick responder", "Replies same day", "Active evenings",
+    "Morning person", "Likes voice notes", "Prefers WhatsApp", "Prefers calls",
+    "Detailed writer", "Concise communicator", "Very responsive", "Thoughtful replier"
+  ];
+
+  const personalityTags = {
+    "Business Partners": ["Local", "Direct", "Goal-driven", "Strategic", "Networked", "Ambitious", "Results-oriented", "Experienced", "Reliable", "Decisive"],
+    "Collaborators": ["Creative", "Technical", "Execution-strong", "Team-player", "Visionary", "Resourceful", "Detail-oriented", "Adaptable", "Proactive", "Innovative"],
+    "Investors": ["Patient", "Strategic", "Hands-on", "Risk-tolerant", "Value-add", "Selective", "Long-term", "Network-rich", "Insightful", "Disciplined"],
+    "Mentors": ["Supportive", "Patient", "Direct", "Encouraging", "Experienced", "Insightful", "Structured", "Motivational", "Wise", "Approachable"],
+    "Accountability Partners": ["Consistent", "Disciplined", "Reliable", "Structured", "No-excuses", "Progress-driven", "Honest", "Committed", "Focused", "Punctual"],
+    "Sponsors": ["Community-oriented", "Impact-driven", "Visible", "Generous", "Strategic", "Long-term", "Brand-aligned", "Network-access", "Resourceful", "Supportive"],
+    "Recruiters": ["Responsive", "Professional", "Detail-oriented", "Networked", "Efficient", "Candidate-focused", "Industry-savvy", "Discreet", "Organized", "Proactive"],
+    "Introducers": ["Well-connected", "Discreet", "Selective", "Trustworthy", "Strategic", "Relationship-driven", "High-level", "Cross-industry", "Value-adding", "Confidential"],
+    "Friends": ["Laid-back", "Reliable", "Fun", "Thoughtful", "Active", "Open-minded", "Loyal", "Easy-going", "Adventurous", "Supportive"],
+    "Companions": ["Casual", "Respectful", "Present", "Spontaneous", "Chill", "Conversation-driven", "Activity-based", "Open-minded", "Reliable", "Easy-going"]
+  };
+
+  const industryTags = {
+    "Business Partners": ["FinTech", "Agribusiness", "E-commerce", "Renewable Energy", "Logistics", "Real Estate", "Tourism", "Manufacturing", "HealthTech", "EdTech"],
+    "Collaborators": ["Software Development", "Digital Marketing", "Product Design", "Operations", "Content Creation", "Supply Chain", "Data Science", "UI/UX", "Hardware", "AI/ML"],
+    "Investors": ["Venture Capital", "Angel Investing", "Private Equity", "Impact Investing", "Seed Funding", "Growth Equity", "Real Estate Investment", "Commodity Trading", "Crypto/Web3", "Infrastructure"],
+    "Mentors": ["Entrepreneurship", "Leadership", "Finance", "Marketing", "Tech Startups", "Scaling Businesses", "Personal Development", "Career Strategy", "Innovation", "Sustainability"],
+    "Accountability Partners": ["Productivity", "Fitness", "Financial Discipline", "Learning Habits", "Business Growth", "Writing", "Side Hustles", "Minimalism", "Mental Health", "Time Management"],
+    "Sponsors": ["Events", "Sports", "Arts & Culture", "Education", "Youth Empowerment", "Sustainability", "Tech Conferences", "Social Impact", "Media", "Community Projects"],
+    "Recruiters": ["Tech Talent", "Finance & Banking", "Creative Industries", "Healthcare", "Engineering", "Sales & Marketing", "Executive Search", "Remote Work", "Hospitality", "NGO/Non-profit"],
+    "Introducers": ["Government Relations", "Corporate Boards", "International Trade", "Startup Ecosystem", "Philanthropy", "Media & PR", "Investment Banking", "Policy & Regulation", "Diaspora Networks", "High-net-worth Individuals"],
+    "Friends": ["Nyama Choma Nights", "Coffee & Deep Talks", "Outdoor Adventures", "Gaming", "Book Club", "Fitness", "Music & Concerts", "Travel", "Food Exploration", "Tech & Startups"],
+    "Companions": ["Weekend Getaways", "City Exploration", "Hiking & Nature", "Cultural Events", "Casual Dining", "Movie Nights", "Sports & Games", "Creative Jams", "Road Trips", "Chill Hangouts"]
+  };
+
+  function generateProfile(forCategory) {
+    const gender = Math.random() < 0.55 ? 'female' : 'male';
+    const first = gender === 'male' ? randomChoice(firstNamesMale) : randomChoice(firstNamesFemale);
+    const last = randomChoice(surnames);
+    const name = `${first} ${last}`;
+
+    let loc = randomChoice(locationBases);
+    if (loc === "Dar es Salaam" && Math.random() < 0.75) {
+      loc += ` • ${randomChoice(locationModifiers)}`.trim();
+    }
+    const style = randomChoice(responseStyles);
+    const desc = `Based in ${loc} • ${style}`;
+
+    const personality = randomSample(personalityTags[forCategory] || personalityTags["Business Partners"], randomInt(2, 4));
+    const industries = randomSample(industryTags[forCategory] || industryTags["Business Partners"], randomInt(2, 3));
+
+    return { name, desc, personality, industries };
+  }
+
+  function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function randomSample(arr, k) {
+    const copy = arr.slice();
+    const result = [];
+    for (let i = 0; i < k && copy.length; i++) {
+      const idx = Math.floor(Math.random() * copy.length);
+      result.push(copy.splice(idx, 1)[0]);
+    }
+    return result;
   }
 
   // ──────────────────────────────────────────────
@@ -235,6 +397,7 @@
     msg.append(content, time);
     messagesEl.appendChild(msg);
     messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+    saveState();
   }
 
   async function typeWriter(fullText, element) {
@@ -254,7 +417,6 @@
 
   async function botReply(text, delay = true) {
     if (delay) await thoughtfulDelay();
-
     const msg = document.createElement('div');
     msg.className = 'message bot';
     const content = document.createElement('div');
@@ -265,9 +427,9 @@
     msg.appendChild(time);
     messagesEl.appendChild(msg);
     messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
-
     await thoughtfulDelay(600, 1400);
     await typeWriter(text, content);
+    saveState();
   }
 
   function addSuggestions(options, onSelect) {
@@ -289,6 +451,7 @@
     });
     messagesEl.appendChild(container);
     messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+    saveState();
   }
 
   // ──────────────────────────────────────────────
@@ -371,38 +534,45 @@
       await botReply("Searching for strong, low-noise matches now…");
       await thoughtfulDelay(2800, 4200);
 
-      const fakeMatches = [
-        {name: "Aisha Mwangi", desc: `Dar es Salaam • Usually replies within hours • Prefers WhatsApp`, tags: ["Local", "Direct", "Goal-driven"]},
-        {name: "Jamal Kweka", desc: `Based in ${userLocation.split(',')[0]} • Likes voice notes • Evenings active`, tags: ["Relaxed", "Supportive"]},
-        {name: "Fatima Zuberi", desc: `Passionate about meaningful ${connectionType.toLowerCase()} • Loves thoughtful convos`, tags: ["Creative", "Deep"]}
-      ];
+      const numMatches = randomInt(3, 5);
+      const matches = [];
+      for (let i = 0; i < numMatches; i++) {
+        matches.push(generateProfile(connectionType));
+      }
 
-      await botReply(`Here are three people who align well with what you described, ${userName}:`);
+      await botReply(`Here are ${numMatches} strong matches aligned with your ${connectionType.toLowerCase()} criteria, ${userName}:`);
 
-      fakeMatches.forEach(m => {
+      matches.forEach(m => {
         addMessage(
           `<strong>${m.name}</strong><br>${m.desc}<br>` +
-          `<div style="margin-top:8px;">${m.tags.map(t => `<span style="background:rgba(74,222,128,0.12);color:var(--accent);padding:4px 10px;border-radius:12px;font-size:0.9rem;margin-right:6px;">${t}</span>`).join('')}</div>`,
+          `<div class="tags-row">` +
+          m.personality.map(t => `<span class="tag personality-tag">${t}</span>`).join('') +
+          `</div>` +
+          `<div class="tags-row">` +
+          m.industries.map(t => `<span class="tag industry-tag">${t}</span>`).join('') +
+          `</div>`,
           false
         );
       });
 
       await thoughtfulDelay(1400, 2200);
-      await botReply(`Based on what you shared, Aisha looks especially aligned — but the decision is yours.`);
+      const standout = randomChoice(matches);
+      await botReply(`Based on what you shared, <strong>${standout.name}</strong> stands out as especially well-aligned — but the choice is completely yours.`);
+
       await botReply("What would you like to do next?");
 
       addSuggestions([
-        "Send connection request to Aisha",
+        `Send connection request to ${standout.name.split(' ')[0]}`,
         "Show more options",
         "Try a different type of connection"
       ], async (ch) => {
-        if (ch.includes("Aisha")) {
-          currentMatchName = "Aisha Mwangi";
+        if (ch.includes("Send connection request to")) {
+          currentMatchName = ch.split("to ")[1] || standout.name;
           state = 'awaiting_user_intent_message';
           await botReply(pickVariant('depthRequest'));
           await botReply(pickVariant('stakesRaiser').replace('{person}', currentMatchName));
           await botReply(pickVariant('guidance'));
-          inputEl.placeholder = `Message to ${currentMatchName}…`;
+          inputEl.placeholder = `Message to ${currentMatchName.split(' ')[0]}…`;
         }
         else if (ch.toLowerCase().includes("more")) {
           await botReply("Looking for additional strong matches… one moment.");
@@ -418,7 +588,6 @@
     }
 
     if (state === 'awaiting_user_intent_message') {
-      // Simulate sending (in production: actually transmit to backend)
       const sentMsg = pickVariant('confirmation').replace('{person}', currentMatchName);
       await botReply(sentMsg);
       await botReply(pickVariant('nextEvent'));
@@ -450,7 +619,6 @@
       return;
     }
 
-    // Fallback
     await botReply("Let’s stay focused. Who are you looking to connect with right now?");
   }
 
@@ -473,9 +641,17 @@
   });
 
   window.addEventListener('load', async () => {
+    loadState();
     updateLocation();
-    await thoughtfulDelay(600, 1200);
-    await botReply("This is for intentional, high-signal connections. What should I call you?");
+
+    if (userName && state !== 'asking_name') {
+      // Resume flow if user was in progress
+      await botReply(`Welcome back, ${userName}.`);
+      // You can add logic here to re-show last messages or jump to current state if needed
+    } else {
+      await thoughtfulDelay(600, 1200);
+      await botReply("This is for intentional, high-signal connections. What should I call you?");
+    }
   });
 </script>
 </body>
