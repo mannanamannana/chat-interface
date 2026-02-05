@@ -10,7 +10,6 @@
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       height: 100vh;
       background: linear-gradient(145deg, #0a0a0a, #1a1a1a, #111111);
@@ -21,22 +20,19 @@
       align-items: center;
       justify-content: center;
     }
-
     .background {
       position: absolute;
       inset: 0;
-      background: 
+      background:
         radial-gradient(circle at 15% 20%, rgba(80,80,90,0.07) 0%, transparent 50%),
         radial-gradient(circle at 85% 75%, rgba(60,60,80,0.05) 0%, transparent 60%);
       pointer-events: none;
       animation: slow-drift 45s infinite alternate ease-in-out;
     }
-
     @keyframes slow-drift {
-      0%   { transform: translate(0, 0) scale(1); }
+      0% { transform: translate(0, 0) scale(1); }
       100% { transform: translate(-2%, 3%) scale(1.025); }
     }
-
     .assistant {
       position: relative;
       width: 400px;
@@ -46,7 +42,7 @@
       -webkit-backdrop-filter: blur(18px) saturate(120%);
       border-radius: 32px;
       border: 1px solid rgba(140, 140, 160, 0.07);
-      box-shadow: 
+      box-shadow:
         0 12px 48px rgba(0, 0, 0, 0.7),
         inset 0 0 0 1px rgba(200, 200, 220, 0.04);
       overflow: hidden;
@@ -54,21 +50,18 @@
       flex-direction: column;
       transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-
     .assistant:hover {
       transform: translateY(-16px) scale(1.02);
-      box-shadow: 
+      box-shadow:
         0 40px 100px rgba(0, 0, 0, 0.8),
         inset 0 0 0 1px rgba(160, 160, 180, 0.12),
-        /* Enhanced rainbow glow layers – stronger & more visible */
-        0 0 30px 4px  rgba(255, 0, 120, 0.10),
-        0 0 50px 8px  rgba(255, 80, 0,   0.09),
-        0 0 70px 12px rgba(220, 255, 0,  0.07),
-        0 0 90px 16px rgba(0, 255, 140,  0.06),
+        0 0 30px 4px rgba(255, 0, 120, 0.10),
+        0 0 50px 8px rgba(255, 80, 0, 0.09),
+        0 0 70px 12px rgba(220, 255, 0, 0.07),
+        0 0 90px 16px rgba(0, 255, 140, 0.06),
         0 0 110px 20px rgba(0, 140, 255, 0.05),
         0 0 130px 24px rgba(120, 0, 255, 0.04);
     }
-
     .header {
       padding: 18px 24px;
       display: flex;
@@ -77,23 +70,20 @@
       border-bottom: 1px solid rgba(120,120,140,0.08);
       background: linear-gradient(to bottom, rgba(30,30,38,0.18), transparent);
     }
-
     .orb {
       width: 44px;
       height: 44px;
       background: linear-gradient(135deg, #4a4a5c, #2a2a38, #3a3a48);
       border-radius: 50%;
-      box-shadow: 
+      box-shadow:
         0 0 24px rgba(80, 80, 100, 0.3),
         inset 0 2px 6px rgba(220,220,240,0.06);
       animation: pulse 5s infinite ease-in-out;
     }
-
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 0.85; }
-      50%      { transform: scale(1.04); opacity: 0.95; }
+      50% { transform: scale(1.04); opacity: 0.95; }
     }
-
     .status {
       font-size: 0.9rem;
       font-weight: 500;
@@ -103,7 +93,6 @@
       border: 1px solid rgba(120,120,140,0.12);
       color: #a0a0b0;
     }
-
     .chat-area {
       flex: 1;
       padding: 24px;
@@ -112,7 +101,6 @@
       flex-direction: column;
       gap: 16px;
     }
-
     .message {
       max-width: 80%;
       padding: 14px 18px;
@@ -121,21 +109,54 @@
       font-size: 0.97rem;
       backdrop-filter: blur(6px);
     }
-
     .user {
       align-self: flex-end;
       background: rgba(50, 50, 70, 0.38);
       border: 1px solid rgba(100, 100, 130, 0.25);
       border-bottom-right-radius: 6px;
     }
-
     .ai {
       align-self: flex-start;
       background: rgba(70, 70, 90, 0.28);
       border: 1px solid rgba(120, 120, 150, 0.22);
       border-bottom-left-radius: 6px;
     }
-
+    .typing {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 18px;
+      background: rgba(70, 70, 90, 0.28);
+      border: 1px solid rgba(120, 120, 150, 0.22);
+      border-radius: 18px;
+      border-bottom-left-radius: 6px;
+      width: fit-content;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #a0a0b0;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+    .ended {
+      align-self: center;
+      background: rgba(120, 50, 50, 0.25);
+      border: 1px solid rgba(180, 80, 80, 0.3);
+      color: #ff9999;
+      font-weight: 600;
+      text-align: center;
+      padding: 12px 20px;
+      border-radius: 16px;
+      margin: 20px auto;
+    }
     .input-area {
       padding: 18px 24px;
       border-top: 1px solid rgba(120,120,140,0.08);
@@ -143,7 +164,6 @@
       display: flex;
       gap: 14px;
     }
-
     input[type="text"] {
       flex: 1;
       padding: 15px 20px;
@@ -156,12 +176,14 @@
       backdrop-filter: blur(10px);
       transition: all 0.2s;
     }
-
     input[type="text"]:focus {
       background: rgba(255,255,255,0.08);
       box-shadow: 0 0 0 2px rgba(140, 140, 170, 0.2);
     }
-
+    input:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
     button {
       width: 52px;
       height: 52px;
@@ -173,17 +195,20 @@
       cursor: pointer;
       transition: all 0.25s;
     }
-
     button:hover {
       transform: scale(1.08);
       box-shadow: 0 0 20px rgba(100, 100, 140, 0.35);
     }
+    button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>
-
   <div class="background"></div>
-
   <div class="assistant">
     <div class="header">
       <div class="orb"></div>
@@ -193,41 +218,102 @@
       </div>
       <div class="status">Upgrade 26%</div>
     </div>
-
     <div class="chat-area" id="chat">
       <!-- Chat starts empty -->
     </div>
-
     <div class="input-area">
       <input type="text" placeholder="Type your message…" id="input" autocomplete="off"/>
-      <button>→</button>
+      <button id="sendBtn">→</button>
     </div>
   </div>
 
   <script>
     const input = document.getElementById('input');
+    const sendBtn = document.getElementById('sendBtn');
     const chat = document.getElementById('chat');
 
-    input.addEventListener('keypress', e => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        const userMsg = document.createElement('div');
-        userMsg.className = 'message user';
-        userMsg.textContent = input.value.trim();
-        chat.appendChild(userMsg);
+    let conversationEnded = false;
 
+    function addMessage(className, content) {
+      const msg = document.createElement('div');
+      msg.className = `message ${className}`;
+      msg.textContent = content;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function showTyping() {
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.id = 'typingIndicator';
+      typing.innerHTML = `
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      `;
+      chat.appendChild(typing);
+      chat.scrollTop = chat.scrollHeight;
+      return typing;
+    }
+
+    function removeTyping() {
+      const typing = document.getElementById('typingIndicator');
+      if (typing) typing.remove();
+    }
+
+    function endConversation() {
+      conversationEnded = true;
+      input.disabled = true;
+      sendBtn.disabled = true;
+      input.placeholder = "Conversation has ended";
+      
+      const endedMsg = document.createElement('div');
+      endedMsg.className = 'ended';
+      endedMsg.textContent = 'Conversation Ended';
+      chat.appendChild(endedMsg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function handleSend() {
+      if (conversationEnded || !input.value.trim()) return;
+
+      // Add user message
+      addMessage('user', input.value.trim());
+
+      // Show typing animation
+      showTyping();
+
+      // Clear input
+      input.value = '';
+
+      // Simulate thinking
+      setTimeout(() => {
+        removeTyping();
+
+        // Add bold UWU message
+        addMessage('ai', 
+          "HEY. Thanks for checking in. " +
+          "I am currently being developed by the team at UWU. " +
+          "Soon I will be able to assist you in the BEST way possible — stay tuned."
+        );
+
+        // Short delay then end conversation
         setTimeout(() => {
-          const aiMsg = document.createElement('div');
-          aiMsg.className = 'message ai';
-          aiMsg.textContent = 'Understood. Processing request... Response generated.';
-          chat.appendChild(aiMsg);
-          chat.scrollTop = chat.scrollHeight;
-        }, 1000 + Math.random()*500);
+          endConversation();
+        }, 1800);
 
-        input.value = '';
-        chat.scrollTop = chat.scrollHeight;
+      }, 1400 + Math.random() * 600);
+    }
+
+    // Enter key
+    input.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        handleSend();
       }
     });
-  </script>
 
+    // Send button
+    sendBtn.addEventListener('click', handleSend);
+  </script>
 </body>
 </html>
